@@ -6,6 +6,7 @@ Este repositório contém códigos desenvolvidos em Prolog para a matéria de In
 
 O repositório está estruturado da seguinte forma:
 
+```
 artificial-intelligence-application/
 │
 ├── README.md          # Este arquivo
@@ -17,3 +18,4 @@ artificial-intelligence-application/
     ├── teoria.pdf     # Documentos teóricos sobre Prolog e IA
     ├── exercicios.pdf # Exercícios e resoluções
     └── ...            # Outros documentos
+```
