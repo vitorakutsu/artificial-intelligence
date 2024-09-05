@@ -29,16 +29,20 @@ ligacao(sorocaba, sao_paulo, 100).
 % LIGAÇÕES DE SAO PAULO PARA OUTRAS CIDADES
 ligacao(sao_paulo, santos, 71).
 
-% Encontra todos os caminhos possíveis entre duas cidades, evitando visitar cidades repetidas.
-todos_os_caminhos(Origem, Destino, Caminho, DistanciaTotal) :- 
+caminhos(Origem, Destino, Caminho, DistanciaTotal) :- 
     busca_caminho(Origem, Destino, [Origem], CaminhoInvertido, DistanciaTotal),
     reverse(CaminhoInvertido, Caminho).
 
-% Busca recursiva para encontrar caminhos, mantendo o histórico de cidades visitadas.
 busca_caminho(Destino, Destino, Caminho, Caminho, 0).
 busca_caminho(Origem, Destino, Visitados, Caminho, DistanciaTotal) :-
     ligacao(Origem, ProximaCidade, Distancia),
-    \+ member(ProximaCidade, Visitados), % Evitar ciclos
+    \+ member(ProximaCidade, Visitados),
     busca_caminho(ProximaCidade, Destino, [ProximaCidade | Visitados], Caminho, DistanciaRestante),
     DistanciaTotal is Distancia + DistanciaRestante.
 
+menor_distancia(Origem, Destino, MelhorCaminho, MenorDistancia) :-
+    setof(Distancia-Caminho, caminhos(Origem, Destino, Caminho, Distancia), 
+    [MenorDistancia-MelhorCaminho|_]).
+
+coletar_caminhos(Origem, Destino, Caminhos) :-
+    findall((Caminho, Distancia), caminhos(Origem, Destino, Caminho, Distancia), Caminhos).
