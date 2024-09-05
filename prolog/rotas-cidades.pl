@@ -29,20 +29,24 @@ ligacao(sorocaba, sao_paulo, 100).
 % LIGAÇÕES DE SAO PAULO PARA OUTRAS CIDADES
 ligacao(sao_paulo, santos, 71).
 
-caminhos(Origem, Destino, Caminho, DistanciaTotal) :- 
-    busca_caminho(Origem, Destino, [Origem], CaminhoInvertido, DistanciaTotal),
-    reverse(CaminhoInvertido, Caminho).
+pode_ir(Origem, Destino, Distancia) :- ligacao(Origem, Destino, Distancia) ; ligacao(Destino, Origem, Distancia).
 
-busca_caminho(Destino, Destino, Caminho, Caminho, 0).
-busca_caminho(Origem, Destino, Visitados, Caminho, DistanciaTotal) :-
-    ligacao(Origem, ProximaCidade, Distancia),
-    \+ member(ProximaCidade, Visitados),
-    busca_caminho(ProximaCidade, Destino, [ProximaCidade | Visitados], Caminho, DistanciaRestante),
-    DistanciaTotal is Distancia + DistanciaRestante.
+busca(Origem, Destino) :- ligacao(Origem, Destino).
+busca(Origem, Destino) :- ligacao(Origem, Distancia), busca(Distancia, Destino).
 
-menor_distancia(Origem, Destino, MelhorCaminho, MenorDistancia) :-
-    setof(Distancia-Caminho, caminhos(Origem, Destino, Caminho, Distancia), 
-    [MenorDistancia-MelhorCaminho|_]).
+busca2(Origem, Destino, [Origem, Destino]):- ligacao(Origem, Destino).
+busca2(Origem, Destino, Caminho) :- ligacao(Origem, Distancia), busca2(Distancia, Destino, CaminhoAux), Caminho = [Origem | CaminhoAux].
 
-coletar_caminhos(Origem, Destino, Caminhos) :-
-    findall((Caminho, Distancia), caminhos(Origem, Destino, Caminho, Distancia), Caminhos).
+dfs(Origem, Destino, Caminho, DistanciaTotal) :- rota(Origem, Destino, [Origem], Caminho, 0, DistanciaTotal).
+
+rota(Origem, Origem, Caminho, Caminho, DistanciaTotal, DistanciaTotal).
+rota(Origem, Destino, Visitados, Caminho, DistanciaAux, DistanciaTotal):-
+    pode_ir(Origem, V, Distancia),
+    NovaDistancia is DistanciaAux + Distancia,
+    not(member(V, Visitados)),
+    rota(V, Destino, [V | Visitados], Caminho, NovaDistancia, DistanciaTotal).
+
+% MENOR DISTÂNCIA ENTRE DUAS CIDADES
+menor_distancia(Origem, Destino, Caminho, DistanciaTotal) :- findall(Distancia, dfs(Origem, Destino, Caminho, Distancia), Distancias), min_list(Distancias, DistanciaTotal).
+
+% findall([Caminho,DistanciaTotal],dfs(presidente_prudente,sao_paulo,Caminho,DistanciaTotal),Caminhos)
